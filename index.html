@@ -53,43 +53,72 @@
       font-weight: 500;
       margin-top: 10px;
     }
+    #loadMoreBtn {
+      display: block;
+      margin: 30px auto;
+      background: #28a745;
+      color: white;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h1>All Courses</h1>
   <div class="course-grid" id="courseGrid">Loading...</div>
+  <button id="loadMoreBtn" style="display: none;">Load More</button>
 
   <script>
     const container = document.getElementById('courseGrid');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
 
-    fetch('https://api.khanglobalstudies.com/cms/courses')
-      .then(res => res.json())
-      .then(data => {
-        const courses = data.data || [];
-        if (courses.length === 0) {
-          container.innerHTML = 'No courses available.';
-          return;
-        }
+    let nextPageUrl = 'https://api.khanglobalstudies.com/cms/courses';
 
-        container.innerHTML = '';
-        courses.forEach(course => {
-          const image = course.image?.medium || '';
-          const title = course.title || 'Untitled';
-          const courseId = course.id;
+    function loadCourses(url) {
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const courses = data.data || [];
+          if (container.innerHTML === 'Loading...') container.innerHTML = '';
 
-          container.innerHTML += `
-            <div class="course-card">
-              <img src="${image}" alt="${title}">
-              <div class="course-title">${title}</div>
-              <a href="course-detail.html?courseId=${courseId}" class="view-btn">View Course</a>
-            </div>
-          `;
+          courses.forEach(course => {
+            const image = course.image?.medium || '';
+            const title = course.title || 'Untitled';
+            const courseId = course.id;
+
+            container.innerHTML += `
+              <div class="course-card">
+                <img src="${image}" alt="${title}">
+                <div class="course-title">${title}</div>
+                <a href="course-detail.html?courseId=${courseId}" class="view-btn">View Course</a>
+              </div>
+            `;
+          });
+
+          // Update nextPageUrl
+          nextPageUrl = data.next_page_url;
+
+          // Show or hide button
+          loadMoreBtn.style.display = nextPageUrl ? 'block' : 'none';
+        })
+        .catch(err => {
+          console.error(err);
+          container.innerHTML = 'Failed to load courses.';
         });
-      })
-      .catch(err => {
-        console.error(err);
-        container.innerHTML = 'Failed to load courses.';
-      });
+    }
+
+    // First load
+    loadCourses(nextPageUrl);
+
+    // On button click
+    loadMoreBtn.addEventListener('click', () => {
+      if (nextPageUrl) {
+        loadCourses(nextPageUrl);
+      }
+    });
   </script>
 </body>
 </html>
