@@ -1,47 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KGS Courses</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
-    .container { max-width: 1000px; margin: auto; padding: 20px; }
-    .course { display: flex; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; overflow: hidden; }
-    .course img { width: 200px; object-fit: cover; }
-    .details { padding: 15px; flex-grow: 1; }
-    .details h2 { margin-top: 0; }
-    .details a { display: inline-block; margin-top: 10px; padding: 8px 12px; background: #0073e6; color: white; text-decoration: none; border-radius: 4px; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+    .course { display: flex; background: #fff; padding: 10px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); gap: 20px; }
+    .course img { width: 200px; height: 120px; object-fit: cover; border-radius: 5px; }
+    .course-details { flex-grow: 1; }
+    .course-details h2 { margin: 0 0 10px; }
+    .course-details a { display: inline-block; padding: 8px 12px; background: #0073e6; color: white; text-decoration: none; border-radius: 4px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>All Courses</h1>
-    <div id="courseList">Loading courses...</div>
-  </div>
+  <h1>All Courses</h1>
+  <div id="courses">Loading...</div>
 
   <script>
-    fetch("https://api.khanglobalstudies.com/cms/courses")
+    fetch('data/courses.json')
       .then(res => res.json())
       .then(data => {
-        const container = document.getElementById("courseList");
-        container.innerHTML = "";
+        const container = document.getElementById('courses');
+        container.innerHTML = '';
         data.forEach(course => {
-          container.innerHTML += `
+          if (!course || !course.id) return;
+          container.innerHTML += \`
             <div class="course">
-              <img src="${course.thumbnail}" alt="${course.name}" />
-              <div class="details">
-                <h2>${course.name}</h2>
-                <p>${course.description || ''}</p>
-                <a href="course-detail.html?courseId=${course.id}">View Course</a>
+              <img src="\${course.image_thumb}" alt="Thumbnail">
+              <div class="course-details">
+                <h2>\${course.title}</h2>
+                <p>Start: \${new Date(course.start_at).toLocaleDateString()}</p>
+                <a href="course-detail.html?courseId=\${course.id}">View Course</a>
               </div>
             </div>
-          `;
+          \`;
         });
       })
       .catch(err => {
-        document.getElementById("courseList").innerHTML = "<p>Failed to load courses.</p>";
-        console.error("Error loading courses:", err);
+        document.getElementById('courses').innerHTML = "Failed to load courses.";
+        console.error(err);
       });
   </script>
 </body>
