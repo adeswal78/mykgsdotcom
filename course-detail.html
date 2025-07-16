@@ -1,59 +1,48 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Course Detail</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-        .course-info { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .lessons a { display: block; margin: 10px 0; padding: 10px; background: #0073e6; color: white; text-decoration: none; border-radius: 5px; }
-    </style>
+  <title>Course Detail</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { margin-bottom: 10px; }
+    .lesson a { display: block; background: #0073e6; color: white; padding: 10px; margin: 10px 0; text-decoration: none; border-radius: 4px; }
+  </style>
 </head>
 <body>
-    <div class="course-info" id="course">Loading course info...</div>
-    <div class="lessons" id="lessons">Loading lessons...</div>
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const courseId = urlParams.get('courseId');
+  <h1 id="title">Loading course...</h1>
+  <p id="description"></p>
+  <div id="lessons">Loading lessons...</div>
 
-        const dummyCourses = [
-            { id: 101, name: "Geography Optional", description: "Best course for Geography optional." },
-            { id: 102, name: "Polity Course", description: "Detailed course on Indian Polity." }
-        ];
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = parseInt(urlParams.get('courseId'));
 
-        const dummyLessons = {
-            101: [
-                { id: 1001, name: "Introduction to Geography" },
-                { id: 1002, name: "Physical Geography Basics" }
-            ],
-            102: [
-                { id: 2001, name: "Constitutional Framework" },
-                { id: 2002, name: "Fundamental Rights" }
-            ]
-        };
-
-        const course = dummyCourses.find(c => c.id == courseId);
+    fetch('data/courses.json')
+      .then(res => res.json())
+      .then(courses => {
+        const course = courses.find(c => c.id === courseId);
         if (course) {
-            document.getElementById('course').innerHTML = `
-                <h1>${course.name}</h1>
-                <p>${course.description}</p>
-            `;
+          document.getElementById('title').textContent = course.title;
+          document.getElementById('description').textContent = course.description || '';
         } else {
-            document.getElementById('course').innerHTML = "<p>Course not found.</p>";
+          document.getElementById('title').textContent = 'Course not found';
         }
+      });
 
-        const lessons = dummyLessons[courseId] || [];
-        const lessonContainer = document.getElementById('lessons');
-        if (lessons.length > 0) {
-            lessonContainer.innerHTML = '';
-            lessons.forEach(lesson => {
-                lessonContainer.innerHTML += `<a href="lesson.html?courseId=${courseId}&lessonId=${lesson.id}">${lesson.name}</a>`;
-            });
-        } else {
-            lessonContainer.innerHTML = "<p>No lessons found for this course.</p>";
-        }
-    </script>
+    fetch('data/lessons.json')
+      .then(res => res.json())
+      .then(allLessons => {
+        const match = allLessons.find(item => item.course_id === courseId);
+        const container = document.getElementById('lessons');
+        container.innerHTML = '';
+        (match?.lessons || []).forEach(lesson => {
+          container.innerHTML += \`
+            <div class="lesson">
+              <a href="lesson.html?lessonId=\${lesson.id}">\${lesson.name}</a>
+            </div>
+          \`;
+        });
+      });
+  </script>
 </body>
 </html>
