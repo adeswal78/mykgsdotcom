@@ -3,41 +3,71 @@
 <head>
   <title>KGS Courses</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
-    .course { display: flex; background: #fff; padding: 10px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); gap: 20px; }
-    .course img { width: 200px; height: 120px; object-fit: cover; border-radius: 5px; }
-    .course-details { flex-grow: 1; }
-    .course-details h2 { margin: 0 0 10px; }
-    .course-details a { display: inline-block; padding: 8px 12px; background: #0073e6; color: white; text-decoration: none; border-radius: 4px; }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f2f2f2; }
+    .course {
+      background: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .course img {
+      width: 100%;
+      max-width: 320px;
+      border-radius: 6px;
+    }
+    .course h3 {
+      margin: 10px 0 5px;
+    }
+    .course a {
+      display: inline-block;
+      margin-top: 8px;
+      background: #007bff;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
-  <h1>All Courses</h1>
-  <div id="courses">Loading...</div>
+  <h1>All KGS Courses</h1>
+  <div id="courseContainer"></div>
+
   <script>
-    fetch('https://adeswal78.github.io/mykgsdotcom/data/courses.json')
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('courses');
-        container.innerHTML = '';
-        data.forEach(course => {
-          if (!course || !course.id) return;
-          container.innerHTML += \`
-            <div class="course">
-              <img src="\${course.image_thumb}" alt="Thumbnail">
-              <div class="course-details">
-                <h2>\${course.title}</h2>
-                <p>Start: \${new Date(course.start_at).toLocaleDateString()}</p>
-                <a href="course-detail.html?courseId=\${course.id}">View Course</a>
-              </div>
-            </div>
-          \`;
-        });
-      })
-      .catch(err => {
-        document.getElementById('courses').innerHTML = "Failed to load courses.";
-        console.error(err);
-      });
+    const courses = [
+      {
+        "id": 572,
+        "title": "Maths Foundation 2025 By Gaurav Sir",
+        "start_at": "2025-03-17",
+        "image_large": "https://kgs.nyc3.digitaloceanspaces.com/courses/large/7430b72e-86e4-4cb1-b255-3f1b703c7ae3.jpg"
+      },
+      {
+        "id": 615,
+        "title": "History Optional 2025 - By Amit Sir",
+        "start_at": "2025-02-10",
+        "image_large": "https://kgs.nyc3.digitaloceanspaces.com/courses/large/4dbfd1fd-f6db-4c0e-bd60-8eb58a41601d.jpg"
+      },
+      {
+        "id": 644,
+        "title": "Indian Polity 2025 - By Kanishk Sir",
+        "start_at": "2025-05-01",
+        "image_large": "https://kgs.nyc3.digitaloceanspaces.com/courses/large/0507b75b-8cbb-4c59-a7f3-0d35384706f6.jpg"
+      }
+    ];
+
+    const container = document.getElementById('courseContainer');
+    courses.forEach(course => {
+      const div = document.createElement('div');
+      div.className = 'course';
+      div.innerHTML = `
+        <img src="${course.image_large}" alt="${course.title}">
+        <h3>${course.title}</h3>
+        <p>Start Date: ${new Date(course.start_at).toLocaleDateString()}</p>
+        <a href="course-detail.html?courseId=${course.id}">View Details</a>
+      `;
+      container.appendChild(div);
+    });
   </script>
 </body>
 </html>
