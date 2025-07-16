@@ -1,21 +1,81 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>Lesson Videos</title></head>
+<head>
+  <title>Lesson Videos</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    h1 { margin-bottom: 20px; }
+    .video-card {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .video-card img {
+      width: 160px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .video-info {
+      flex: 1;
+    }
+    .video-info h3 {
+      margin: 0 0 8px;
+    }
+    .video-info a {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #0073e6;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
 <body>
-  <h1>Lesson Videos</h1>
-  <div id="videoList">Loading videos...</div>
+  <h1 id="lessonTitle">Loading Lesson...</h1>
+  <div id="videos">Loading videos...</div>
+
   <script>
     const params = new URLSearchParams(window.location.search);
-    const courseId = params.get("course_id");
-    const lessonId = params.get("lesson_id");
+    const courseId = params.get('courseId');
+    const lessonId = params.get('lessonId');
+
     fetch(`https://api.khanglobalstudies.com/cms/courses/${courseId}/lessons/${lessonId}`)
       .then(res => res.json())
       .then(data => {
-        let html = '';
-        (data.videos || []).forEach(video => {
-          html += `<p>${video.name} - <a href="https://khanglobalstudies.com/player?vvid=${video.id}" target="_blank">Play</a></p>`;
+        document.getElementById('lessonTitle').textContent = data.lesson?.name || 'Lesson';
+
+        const videos = data.lesson?.videos || [];
+        const container = document.getElementById('videos');
+        container.innerHTML = '';
+
+        if (videos.length === 0) {
+          container.innerHTML = 'No videos available.';
+          return;
+        }
+
+        videos.forEach(video => {
+          container.innerHTML += `
+            <div class="video-card">
+              <img src="${video.thumbnail}" alt="${video.name}">
+              <div class="video-info">
+                <h3>${video.name}</h3>
+                <a href="https://khanglobalstudies.com/player?vvid=${video.id}" target="_blank">▶️ Play</a>
+              </div>
+            </div>
+          `;
         });
-        document.getElementById("videoList").innerHTML = html;
+      })
+      .catch(err => {
+        document.getElementById('lessonTitle').textContent = "Failed to load";
+        document.getElementById('videos').innerHTML = "Something went wrong.";
+        console.error(err);
       });
   </script>
 </body>
