@@ -3,77 +3,129 @@
 <head>
   <title>Lecture List</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
-    h1 { margin-bottom: 20px; }
-    .video {
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    .tab {
+      padding: 10px 20px;
+      margin-right: 10px;
+      background: #ddd;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .tab.active {
       background: #fff;
-      margin: 10px 0;
+      border-bottom: 2px solid #f5f5f5;
+    }
+    .tab-content {
+      display: none;
+      background: #fff;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 0 6px 6px 6px;
       box-shadow: 0 0 6px rgba(0,0,0,0.1);
     }
-    .video img {
+    .tab-content.active {
+      display: block;
+    }
+    .item {
+      margin-bottom: 12px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .item a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    .item img {
       max-width: 120px;
       margin-right: 10px;
       vertical-align: middle;
       border-radius: 4px;
     }
-    .video a {
-      text-decoration: none;
-      color: #333;
-      font-weight: bold;
-    }
-    .pdf {
-      color: darkred;
-      font-weight: normal;
-      margin-left: 10px;
-    }
   </style>
 </head>
 <body>
   <h1 id="lessonTitle">Loading lessons...</h1>
-  <div id="videos">Please wait...</div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('videos')">Videos</div>
+    <div class="tab" onclick="switchTab('notes')">Notes</div>
+  </div>
+
+  <div id="videosTab" class="tab-content active"></div>
+  <div id="notesTab" class="tab-content"></div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get('courseId');
     const lessonId = urlParams.get('lessonId');
 
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      if (tab === 'videos') {
+        document.querySelector('.tab:nth-child(1)').classList.add('active');
+        document.getElementById('videosTab').classList.add('active');
+      } else {
+        document.querySelector('.tab:nth-child(2)').classList.add('active');
+        document.getElementById('notesTab').classList.add('active');
+      }
+    }
+
     fetch(`https://api.khanglobalstudies.com/cms/courses/${courseId}/lessons/${lessonId}`)
       .then(res => res.json())
       .then(data => {
         document.getElementById('lessonTitle').textContent = data.name || 'Lesson';
         const videos = data.videos || [];
-        const container = document.getElementById('videos');
-        container.innerHTML = '';
+        const videoContainer = document.getElementById('videosTab');
+        const notesContainer = document.getElementById('notesTab');
+
+        videoContainer.innerHTML = '';
+        notesContainer.innerHTML = '';
 
         if (videos.length === 0) {
-          container.innerHTML = 'No videos or PDFs found.';
+          videoContainer.innerHTML = 'No videos found.';
+          notesContainer.innerHTML = 'No notes found.';
           return;
         }
 
         videos.forEach(video => {
-          let html = `<div class="video">`;
+          let html = `<div class="item">`;
 
           if (video.type === 'yt' && video.video_url) {
             html += `
               <a href="${video.video_url}" target="_blank">
                 <img src="${video.thumb}" alt="Thumbnail" />
                 ${video.name}
-              </a>`;
-          } else if (video.type === 'pdf') {
-            html += `<span>📄 ${video.name} <span class="pdf">(PDF)</span></span>`;
-          } else {
-            html += `<span>${video.name}</span>`;
+              </a>
+            `;
+            videoContainer.innerHTML += html + `</div>`;
           }
 
-          html += `</div>`;
-          container.innerHTML += html;
+          if (video.type === 'pdf') {
+            // Construct PDF URL if needed, or show as plain text (if URL not present)
+            const pdfUrl = `https://api.khanglobalstudies.com/pdf/${video.id}`;
+            html += `<a href="${pdfUrl}" target="_blank">📄 ${video.name}</a>`;
+            notesContainer.innerHTML += html + `</div>`;
+          }
         });
       })
       .catch(err => {
-        document.getElementById('lessonTitle').textContent = 'Failed to load lessons';
-        document.getElementById('videos').innerHTML = 'Something went wrong.';
+        document.getElementById('lessonTitle').textContent = 'Failed to load lesson';
+        document.getElementById('videosTab').innerHTML = 'Something went wrong.';
+        document.getElementById('notesTab').innerHTML = '';
         console.error(err);
       });
   </script>
