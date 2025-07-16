@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Lesson Videos</title></head>
+<body>
+  <h1>Lesson Videos</h1>
+  <div id="videoList">Loading videos...</div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const courseId = params.get("course_id");
+    const lessonId = params.get("lesson_id");
+    fetch(`https://api.khanglobalstudies.com/cms/courses/${courseId}/lessons/${lessonId}`)
+      .then(res => res.json())
+      .then(data => {
+        let html = '';
+        (data.videos || []).forEach(video => {
+          html += `<p>${video.name} - <a href="https://khanglobalstudies.com/player?vvid=${video.id}" target="_blank">Play</a></p>`;
+        });
+        document.getElementById("videoList").innerHTML = html;
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Course Detail</title></head>
+<body>
+  <h1>Course Detail</h1>
+  <div id="lessonList">Loading lessons...</div>
+  <script>
+    const courseId = new URLSearchParams(window.location.search).get("course_id");
+    fetch(`https://api.khanglobalstudies.com/cms/courses/${courseId}`)
+      .then(res => res.json())
+      .then(course => {
+        document.body.insertAdjacentHTML("afterbegin", `<h2>${course.name}</h2>`);
+      });
+    fetch(`https://api.khanglobalstudies.com/cms/courses/${courseId}/lessons`)
+      .then(res => res.json())
+      .then(lessons => {
+        let html = '';
+        lessons.forEach(lesson => {
+          html += `<a href="lesson.html?course_id=${courseId}&lesson_id=${lesson.id}">${lesson.name}</a><br>`;
+        });
+        document.getElementById("lessonList").innerHTML = html;
+      });
+  </script>
+</body>
+</html>
