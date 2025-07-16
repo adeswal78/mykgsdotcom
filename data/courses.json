@@ -1,16 +1,11 @@
 [
   {
-    "id": 101,
-    "title": "Indian Polity by Khan Sir",
-    "image_thumb": "https://i.postimg.cc/3rW4s7Xy/polity.jpg",
-    "description": "Complete Indian Polity with MCQs",
-    "start_at": "2024-06-01"
-  },
-  {
-    "id": 102,
-    "title": "Geography Full Course",
-    "image_thumb": "https://i.postimg.cc/Gm7Hn0r4/geography.jpg",
-    "description": "NCERT to Advanced Geography",
-    "start_at": "2024-07-01"
+    "id": 572,
+    "title": "Maths Foundation 2025 By Gaurav Sir",
+    "category_id": 2,
+    "start_at": "2025-03-17",
+    "end_at": "2026-03-17",
+    "image_large": "https://kgs.nyc3.digitaloceanspaces.com/courses/large/7430b72e-86e4-4cb1-b255-9444f18fc99e.jpg",
+    "image_thumb": "https://kgs.nyc3.digitaloceanspaces.com/courses/thumb/7430b72e-86e4-4cb1-b255-9444f18fc99e.jpg"
   }
 ]
