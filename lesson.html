@@ -38,20 +38,35 @@
       display: block;
     }
     .item {
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       border-bottom: 1px solid #eee;
-      padding-bottom: 10px;
+      padding-bottom: 12px;
     }
-    .item a {
-      text-decoration: none;
-      color: #333;
-      font-weight: bold;
+    .item h3 {
+      margin: 5px 0;
+      font-size: 1rem;
     }
     .item img {
-      max-width: 120px;
-      margin-right: 10px;
-      vertical-align: middle;
+      max-width: 150px;
       border-radius: 4px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .btns {
+      display: flex;
+      gap: 10px;
+    }
+    .btns a {
+      text-decoration: none;
+      padding: 8px 14px;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 0.9em;
+      transition: background-color 0.2s ease;
+    }
+    .btns a:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
@@ -84,6 +99,11 @@
       }
     }
 
+    function extractYouTubeId(thumbUrl) {
+      const match = thumbUrl.match(/vi\/([^/]+)/) || thumbUrl.match(/\/([a-zA-Z0-9_-]{11})\./);
+      return match ? match[1] : null;
+    }
+
     fetch(`https://api.khanglobalstudies.com/cms/courses/${courseId}/lessons/${lessonId}`)
       .then(res => res.json())
       .then(data => {
@@ -104,20 +124,28 @@
         videos.forEach(video => {
           let html = `<div class="item">`;
 
-          if (video.type === 'yt' && video.video_url) {
+          if (video.type === 'yt') {
+            const ytId = video.video_url 
+              ? (video.video_url.split("v=")[1] || "").split("&")[0]
+              : extractYouTubeId(video.thumb);
+            const ytUrl = ytId ? `https://www.youtube.com/watch?v=${ytId}` : '';
+            const kgsUrl = `https://khanglobalstudies.com/player?vvid=${video.id}`;
+
             html += `
-              <a href="${video.video_url}" target="_blank">
-                <img src="${video.thumb}" alt="Thumbnail" />
-                ${video.name}
-              </a>
+              <img src="${video.thumb}" alt="Thumb">
+              <h3>${video.name}</h3>
+              <div class="btns">
+                ${ytUrl ? `<a href="${ytUrl}" target="_blank">YouTube</a>` : ''}
+                <a href="${kgsUrl}" target="_blank">KGS</a>
+              </div>
             `;
+
             videoContainer.innerHTML += html + `</div>`;
           }
 
           if (video.type === 'pdf') {
-            // Construct PDF URL if needed, or show as plain text (if URL not present)
             const pdfUrl = `https://api.khanglobalstudies.com/pdf/${video.id}`;
-            html += `<a href="${pdfUrl}" target="_blank">📄 ${video.name}</a>`;
+            html += `<h3>📄 <a href="${pdfUrl}" target="_blank">${video.name}</a></h3>`;
             notesContainer.innerHTML += html + `</div>`;
           }
         });
