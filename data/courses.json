@@ -1,0 +1,16 @@
+[
+  {
+    "id": 101,
+    "title": "Indian Polity by Khan Sir",
+    "image_thumb": "https://i.postimg.cc/3rW4s7Xy/polity.jpg",
+    "description": "Complete Indian Polity with MCQs",
+    "start_at": "2024-06-01"
+  },
+  {
+    "id": 102,
+    "title": "Geography Full Course",
+    "image_thumb": "https://i.postimg.cc/Gm7Hn0r4/geography.jpg",
+    "description": "NCERT to Advanced Geography",
+    "start_at": "2024-07-01"
+  }
+]
