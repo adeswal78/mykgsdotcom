@@ -40,9 +40,14 @@
         const container = document.getElementById('subjects');
         container.innerHTML = '';
 
+        if (subjects.length === 0) {
+          container.innerHTML = 'No subjects found.';
+          return;
+        }
+
         subjects.forEach(subject => {
           const chapterCount = subject.chapters?.length || 0;
-          const lessonId = subject.chapters?.[0]?.id; // we’ll use first chapter as lessonId
+          const lessonId = subject.chapters?.[0]?.id;
 
           if (lessonId) {
             container.innerHTML += `
@@ -55,10 +60,6 @@
             `;
           }
         });
-
-        if (subjects.length === 0) {
-          container.innerHTML = 'No subjects found.';
-        }
       })
       .catch(err => {
         document.getElementById('courseTitle').textContent = 'Failed to load course';
